@@ -46,10 +46,14 @@
 <script>
 (() => {
   const currencies = [
-    {code:'USD',name:'Dollar américain',flag:'🇺🇸',cls:'us'},
-    {code:'GBP',name:'Livre sterling',flag:'🇬🇧',cls:'gb'},
-    {code:'CHF',name:'Franc suisse',flag:'🇨🇭',cls:'ch'},
-    {code:'JPY',name:'Yen japonais',flag:'🇯🇵',cls:'jp'}
+     
+const currencies = [
+  {code:'USD',name:'Dollar américain',flag:'🇺🇸',cls:'us'},
+  {code:'AUD',name:'Dollar australien',flag:'🇦🇺',cls:'au'},
+  {code:'IDR',name:'Roupie indonésienne',flag:'🇮🇩',cls:'id'},
+  {code:'CHF',name:'Franc suisse',flag:'🇨🇭',cls:'ch'}
+];
+
   ];
   const amountInput = document.getElementById('amount');
   const results = document.getElementById('results');
@@ -77,7 +81,9 @@
   async function loadRates(){
     refresh.disabled=true; status.classList.remove('error'); status.textContent='Récupération des taux de référence…';
     try{
-      const res=await fetch('https://api.frankfurter.dev/v1/latest?base=EUR&symbols=USD,GBP,CHF,JPY',{cache:'no-store'});
+      const res=await fetch('https://
+      const res=await fetch('https://api.frankfurter.dev/v1/latest?base=EUR&symbols=USD,AUD,IDR,CHF',{cache:'no-store'});
+?base=EUR&symbols=USD,GBP,CHF,JPY',{cache:'no-store'});
       if(!res.ok) throw new Error('Réponse indisponible');
       const data=await res.json();
       if(!data.rates || !currencies.every(c=>Number.isFinite(data.rates[c.code]))) throw new Error('Taux incomplets');

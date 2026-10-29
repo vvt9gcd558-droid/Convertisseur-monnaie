@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#f7f8fa">
+  <meta name="description" content="Convertisseur de devises simple, sans publicité, avec conversions simultanées.">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icon.svg" type="image/svg+xml">
+  <title>Monnaie — Convertisseur simple</title>
+  <style>
+    :root{color-scheme:light;--ink:#17212f;--muted:#738091;--line:#e8ebf0;--paper:#f7f8fa;--white:#fff;--accent:#245eea;--green:#15835b}
+    *{box-sizing:border-box} body{margin:0;background:var(--paper);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;letter-spacing:-.02em}
+    main{width:min(100%,520px);margin:0 auto;padding:24px 18px 36px;min-height:100dvh}
+    header{display:flex;align-items:center;justify-content:space-between;margin:6px 0 28px} .brand{display:flex;gap:10px;align-items:center;font-size:19px;font-weight:750;letter-spacing:-.04em}.brand-mark{width:36px;height:36px;border-radius:12px;background:#17212f;color:white;display:grid;place-items:center;font-size:20px}
+    .pill{font-size:12px;color:#45616f;background:#e8f4ef;border-radius:20px;padding:7px 10px;font-weight:650}
+    .eyebrow{font-size:12px;text-transform:uppercase;letter-spacing:.12em;color:var(--muted);font-weight:750;margin:0 0 12px}
+    .base-card{background:var(--white);border:1px solid var(--line);border-radius:24px;padding:20px;margin-bottom:24px;box-shadow:0 8px 28px #15243a08}
+    .base-label{display:flex;align-items:center;gap:11px;margin-bottom:14px}.flag{width:42px;height:42px;border-radius:50%;display:grid;place-items:center;font-size:25px;background:#f1f4f8;flex-shrink:0}.base-label strong{display:block;font-size:16px}.base-label small{display:block;color:var(--muted);font-size:13px;margin-top:3px}
+    .amount-row{display:flex;align-items:center;gap:10px}.amount{width:100%;min-width:0;border:0;outline:0;background:transparent;font-size:clamp(34px,10vw,46px);font-weight:750;letter-spacing:-.06em;color:var(--ink);padding:3px 0}.amount::placeholder{color:#c5ccd5}.base-code{font-size:14px;font-weight:750;color:var(--muted)}
+    .section-head{display:flex;align-items:center;justify-content:space-between;margin:0 2px 12px}.section-head h2{font-size:16px;margin:0;font-weight:750}.icon-button{border:1px solid var(--line);background:white;border-radius:12px;width:40px;height:40px;font-size:18px;display:grid;place-items:center;color:var(--ink);cursor:pointer}.icon-button:active{transform:scale(.97)}
+    .currency-list{display:flex;flex-direction:column;gap:9px}.currency-row{display:flex;align-items:center;gap:12px;background:white;border:1px solid var(--line);border-radius:18px;padding:13px 14px;min-height:78px}.currency-info{flex:1;min-width:0}.currency-info strong{display:block;font-size:15px}.currency-info small{display:block;font-size:12px;color:var(--muted);margin-top:4px}.value{text-align:right;font-size:21px;font-weight:730;letter-spacing:-.045em;overflow-wrap:anywhere}.row-flag{width:39px;height:39px;border-radius:50%;display:grid;place-items:center;font-size:23px;flex-shrink:0}.row-flag.us{background:#fff0f0}.row-flag.gb{background:#eef2ff}.row-flag.ch{background:#fff0f0}.row-flag.jp{background:#fff5f5}
+    .tools{display:flex;gap:9px;margin-top:16px}.tool-button{flex:1;border:1px solid var(--line);background:#fff;border-radius:14px;padding:12px 9px;min-height:47px;color:var(--ink);font-size:13px;font-weight:700;cursor:pointer}.tool-button.primary{background:var(--ink);color:white;border-color:var(--ink)}.tool-button:disabled{opacity:.5}
+    .status{font-size:12px;line-height:1.5;color:var(--muted);margin:17px 3px 0}.status strong{color:#4c5c6e}.error{color:#b42318}.footer{text-align:center;color:#9aa3af;font-size:11px;margin-top:24px;line-height:1.6}
+    .toast{position:fixed;left:50%;bottom:25px;transform:translateX(-50%);background:#17212f;color:white;padding:12px 16px;border-radius:14px;font-size:13px;max-width:90vw;display:none;z-index:10}
+    @media(min-width:520px){main{padding-top:34px}}
+  </style>
+</head>
+<body>
+<main>
+  <header><div class="brand"><span class="brand-mark">↗</span><span>monnaie</span></div><span class="pill">Sans publicité</span></header>
+  <p class="eyebrow">Convertisseur simple</p>
+  <section class="base-card" aria-label="Montant de départ">
+    <div class="base-label"><span class="flag" aria-hidden="true">🇪🇺</span><div><strong>Euro</strong><small>Devise de départ · EUR</small></div></div>
+    <div class="amount-row"><input id="amount" class="amount" type="number" inputmode="decimal" min="0" step="any" value="100" aria-label="Montant en euros"><span class="base-code">EUR</span></div>
+  </section>
+  <div class="section-head"><h2>Vous obtenez</h2><button id="voice" class="icon-button" aria-label="Dicter un montant" title="Dicter un montant">🎙️</button></div>
+  <section id="results" class="currency-list" aria-live="polite">
+    <div class="currency-row"><span class="row-flag us">🇺🇸</span><div class="currency-info"><strong>Dollar américain</strong><small>USD</small></div><div class="value">—</div></div>
+  </section>
+  <div class="tools"><button id="refresh" class="tool-button primary">↻ &nbsp; Actualiser les taux</button><button id="copy" class="tool-button">Copier les résultats</button></div>
+  <p id="status" class="status" role="status">Chargement des taux de référence…</p>
+  <p class="footer">Taux indicatifs de référence · Pas un cours garanti par une banque.<br>Les conversions se recalculent dès que vous modifiez le montant.</p>
+</main>
+<div id="toast" class="toast" role="status"></div>
+<script>
+(() => {
+  const currencies = [
+    {code:'USD',name:'Dollar américain',flag:'🇺🇸',cls:'us'},
+    {code:'GBP',name:'Livre sterling',flag:'🇬🇧',cls:'gb'},
+    {code:'CHF',name:'Franc suisse',flag:'🇨🇭',cls:'ch'},
+    {code:'JPY',name:'Yen japonais',flag:'🇯🇵',cls:'jp'}
+  ];
+  const amountInput = document.getElementById('amount');
+  const results = document.getElementById('results');
+  const status = document.getElementById('status');
+  const refresh = document.getElementById('refresh');
+  let rates = null, rateDate = null, toastTimer;
+  const fmt = (n, code) => new Intl.NumberFormat('fr-FR',{style:'currency',currency:code,maximumFractionDigits:code==='JPY'?0:2}).format(n);
+  function render(){
+    const raw = amountInput.value.trim();
+    const amount = raw === '' ? NaN : Number(raw);
+    results.innerHTML = '';
+    currencies.forEach(c => {
+      const row = document.createElement('div'); row.className='currency-row';
+      const flag = document.createElement('span'); flag.className='row-flag '+c.cls; flag.textContent=c.flag; flag.setAttribute('aria-hidden','true');
+      const info = document.createElement('div'); info.className='currency-info';
+      const name = document.createElement('strong'); name.textContent=c.name;
+      const code = document.createElement('small'); code.textContent=c.code;
+      info.append(name,code);
+      const value = document.createElement('div'); value.className='value';
+      value.textContent = rates && Number.isFinite(amount) && amount>=0 ? fmt(amount*rates[c.code],c.code) : '—';
+      row.append(flag,info,value); results.append(row);
+    });
+  }
+  function sayToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.style.display='block';clearTimeout(toastTimer);toastTimer=setTimeout(()=>t.style.display='none',2600)}
+  async function loadRates(){
+    refresh.disabled=true; status.classList.remove('error'); status.textContent='Récupération des taux de référence…';
+    try{
+      const res=await fetch('https://api.frankfurter.dev/v1/latest?base=EUR&symbols=USD,GBP,CHF,JPY',{cache:'no-store'});
+      if(!res.ok) throw new Error('Réponse indisponible');
+      const data=await res.json();
+      if(!data.rates || !currencies.every(c=>Number.isFinite(data.rates[c.code]))) throw new Error('Taux incomplets');
+      rates=data.rates; rateDate=data.date; render();
+      status.innerHTML='Taux de référence datés du <strong>'+new Date(rateDate+'T12:00:00').toLocaleDateString('fr-FR',{day:'numeric',month:'long',year:'numeric'})+'</strong>. Source : Frankfurter. Les taux ne sont pas nécessairement actualisés en continu.';
+      try{localStorage.setItem('monnaie-rates',JSON.stringify({rates,rateDate,savedAt:Date.now()}));}catch(e){}
+    }catch(e){
+      try{const cached=JSON.parse(localStorage.getItem('monnaie-rates'));if(cached?.rates){rates=cached.rates;rateDate=cached.rateDate;render();status.textContent='Hors ligne : taux enregistrés le '+new Date(cached.savedAt).toLocaleString('fr-FR')+' (date des taux : '+rateDate+'). Reconnectez-vous pour actualiser.';status.classList.add('error');}else throw e;}catch(err){status.textContent='Impossible de charger les taux. Vérifiez votre connexion puis réessayez. Aucun taux fictif n’est affiché.';status.classList.add('error');render();}
+    }finally{refresh.disabled=false;}
+  }
+  amountInput.addEventListener('input',render); refresh.addEventListener('click',loadRates);
+  document.getElementById('copy').addEventListener('click',async()=>{
+    const amount=Number(amountInput.value); if(!rates||!Number.isFinite(amount)||amount<0){sayToast('Saisissez un montant et chargez les taux.');return;}
+    const text=[fmt(amount,'EUR'),...currencies.map(c=>c.code+' : '+fmt(amount*rates[c.code],c.code)),'Taux de référence : '+rateDate].join('\n');
+    try{await navigator.clipboard.writeText(text);sayToast('Résultats copiés.');}catch(e){sayToast('Copie non autorisée par ce navigateur.');}
+  });
+  document.getElementById('voice').addEventListener('click',()=>{
+    const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+    if(!SR){sayToast('La dictée vocale n’est pas prise en charge ici. Utilisez la dictée du clavier.');return;}
+    const rec=new SR();rec.lang='fr-FR';rec.interimResults=false;rec.maxAlternatives=1;
+    sayToast('Je vous écoute… Dites par exemple : « cent euros ».');
+    rec.onresult=e=>{const phrase=e.results[0][0].transcript.toLowerCase();const words={'zéro':'0','zero':'0','un':'1','une':'1','deux':'2','trois':'3','quatre':'4','cinq':'5','six':'6','sept':'7','huit':'8','neuf':'9','dix':'10','vingt':'20','trente':'30','quarante':'40','cinquante':'50','soixante':'60','cent':'100','mille':'1000'};let cleaned=phrase.replace(/euros?|euro|convertis|convertir|en|vers|s'il vous plaît/g,' ').replace(',','.').trim();if(/^\d+(\.\d+)?$/.test(cleaned)){amountInput.value=cleaned;render();sayToast('Montant reconnu.');return;}const nums=cleaned.match(/\d+(?:[.,]\d+)?/);if(nums){amountInput.value=nums[0].replace(',','.');render();sayToast('Montant reconnu.');return;}let total=0;phrase.split(/\s+/).forEach(w=>{if(words[w])total+=Number(words[w]);});if(total>0){amountInput.value=String(total);render();sayToast('Montant reconnu : '+total+' euros.');}else sayToast('Je n’ai pas reconnu le montant. Réessayez ou utilisez le clavier.');};
+    rec.onerror=()=>sayToast('Dictée indisponible. Vérifiez l’autorisation du micro.');rec.start();
+  });
+  if('serviceWorker' in navigator && location.protocol.startsWith('http')) window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));
+  try{const cached=JSON.parse(localStorage.getItem('monnaie-rates'));if(cached?.rates){rates=cached.rates;rateDate=cached.rateDate;render();status.textContent='Taux enregistrés disponibles. Vérification des derniers taux…';}}catch(e){}
+  render();loadRates();
+})();
+</script>
+</body>
+</html>

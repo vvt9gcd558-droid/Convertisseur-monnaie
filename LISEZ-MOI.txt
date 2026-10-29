@@ -1,0 +1,19 @@
+MONNAIE — prototype PWA
+
+Fichiers :
+- index.html : interface et logique du convertisseur
+- manifest.webmanifest : métadonnées pour installation
+- sw.js : cache de l'application pour ouverture ultérieure hors connexion
+- icon.svg : icône
+
+Fonctions incluses :
+- EUR vers USD, GBP, CHF et JPY, conversion simultanée
+- taux de référence via API Frankfurter
+- date des taux affichée
+- cache local des derniers taux chargés
+- bouton d'actualisation
+- copie des résultats
+- commande vocale expérimentale via Web Speech API, selon navigateur
+- sans publicité, sans compte et sans suivi ajouté
+
+IMPORTANT : ce prototype n'est pas encore hébergé sur Internet. Pour tester sur les téléphones, hébergez les fichiers sur un service HTTPS statique. Le service worker et l'installation PWA ne fonctionnent normalement que sur HTTPS (ou localhost). La commande vocale dépend du navigateur et de ses permissions. La source fournit des taux de référence, pas des cotations garanties en temps réel.
